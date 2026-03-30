@@ -1,0 +1,55 @@
+heartbeat.monitors:
+- type: http
+  name: "WordPress CMS"
+  id: wordpress-cms
+  urls: ["http://10.0.0.12/"]
+  schedule: '@every 10s'
+  timeout: 5s
+  check.response.status: [200]
+  fields:
+    service: "wordpress"
+    type: "web"
+
+- type: tcp
+  name: "MySQL Database"
+  id: mysql-db
+  hosts: ["10.0.0.12:3306"]
+  schedule: '@every 10s'
+  timeout: 3s
+  fields:
+    service: "mysql"
+    type: "database"
+
+- type: http
+  name: "Nginx Status"
+  id: nginx-status
+  urls: ["http://10.0.0.12/nginx_status"]
+  schedule: '@every 30s'
+  timeout: 5s
+  fields:
+    service: "nginx"
+    type: "status"
+
+- type: icmp
+  name: "VM1 ICMP"
+  id: vm1-icmp
+  hosts: ["10.0.0.12"]
+  schedule: '@every 30s'
+  fields:
+    service: "network"
+    type: "icmp"
+
+output.elasticsearch:
+  hosts: ["localhost:9200"]
+  protocol: "http"
+
+setup.kibana:
+  host: "localhost:5601"
+
+# Процессоры для обогащения данных
+processors:
+  - add_fields:
+      target: ''
+      fields:
+        environment: "production"
+        monitored_by: "heartbeat"

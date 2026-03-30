@@ -1,0 +1,53 @@
+# =========================== Modules configuration ============================
+metricbeat.config.modules:
+  path: ${path.config}/modules.d/*.yml
+  reload.enabled: false
+
+# =========================== Elasticsearch output ============================
+output.elasticsearch:
+  hosts: ["10.0.0.142:9200"]
+  protocol: "http"
+
+# =========================== Kibana setup ============================
+setup.kibana:
+  host: "10.0.0.142:5601"
+
+# =========================== ILM ============================
+setup.ilm.enabled: false
+setup.template.enabled: false
+
+# =========================== Metricbeat modules ============================
+metricbeat.modules:
+
+# Системные метрики
+- module: system
+  period: 10s
+  metricsets:
+    - cpu
+    - load
+    - memory
+    - network
+    - filesystem
+    - process
+    - process_summary
+  processes: ['.*']
+  process.include_top_n:
+    by_cpu: 5
+    by_memory: 5
+
+# Nginx метрики (если настроен stub_status)
+- module: nginx
+  period: 10s
+  hosts: ["http://localhost/nginx_status"]
+  enabled: false  # Отключаем пока не настроен nginx_status
+
+# MySQL метрики (если настроен пользователь monitor)
+- module: mysql
+  period: 10s
+  hosts: ["tcp(127.0.0.1:3306)/"]
+  enabled: false  # Отключаем пока не настроен пользователь
+  username: "monitor"
+  password: "strong_password"
+
+# Процессы PHP-FPM (используем system module, а не отдельный)
+# Удаляем module: process, так как он включен в system

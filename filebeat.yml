@@ -1,0 +1,17 @@
+filebeat.inputs:
+- type: log
+  enabled: true
+  paths:
+    - /var/log/nginx/access.log
+    - /var/log/nginx/error.log
+    - /var/log/php*-fpm.log
+    - /var/log/mysql/*.log
+
+output.elasticsearch:
+  hosts: ["10.0.0.142:9200"]
+  protocol: "http"
+
+# Отключаем все дополнительные функции
+setup.ilm.enabled: false
+setup.template.enabled: false
+setup.data_stream.enabled: false
